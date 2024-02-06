@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>加密</title>
+<link rel="stylesheet" href="../css/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
+    <link rel="stylesheet" href="../css/base.css">
+</head>
+<body>
+<form class="pure-form">
+<label for="word">明文：</label><textarea id="word" rows="6" class="pure-input-1-2" placeholder="输入用于隐藏机密的明文"></textarea><br><br>
+<label for="secret">机密：</label><input type="text" id="secret" class="pure-input-1-2" placeholder="输入需要加密的文字"><br><br>
+<label for="result">结果：</label><textarea id="result" rows="6" class="pure-input-1-2"></textarea>
+<br>
+</form>
+<a onclick="em()" class="pure-button pure-button-primary">转换</a>
+<button class="btn pure-button pure-button-primary" data-clipboard-target="#result">
+    复制结果
+</button>
+<br>
+<br>
+<button class="button-secondary pure-button" onclick="javascrtpt:window.location.href='../'">去解密</button>
+</body>
+<script src="../js/dc.js"></script>
+<script>
+    function em(){
+        let text = document.getElementById("word").value
+        let secret = document.getElementById("secret").value
+        if(secret.trim() == '') return
+        let result = embed(text, secret.trim(), '')
+        document.getElementById("result").value = result
+        document.getElementById("word").value = ''
+    }
+</script>
+<script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
+<script>
+    new ClipboardJS('.btn');
+</script>
+</html>
