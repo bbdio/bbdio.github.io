@@ -2,34 +2,110 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta property="og:description" content="在普通文本中添加特殊字符为水印，通过位运算等操作进行加密解密
+快来试试吧"/>
+    <meta property="og:title" content="文本水印解密"/>
+    <meta name="sharecontent" content="在普通文本中添加特殊字符为水印，通过位运算等操作进行加密解密
+快来试试吧">
+    <meta name="mediaid" content="文本水印">
+    <meta name="keywords" content="在普通文本中添加特殊字符为水印，通过位运算等操作进行加密解密
+快来试试吧" />
+    <meta name="description" content="在普通文本中添加特殊字符为水印，通过位运算等操作进行加密解密
+快来试试吧" />
+    <meta property="og:url" content="https://i.bbdio.net/code/">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>解码</title>
+    <title>文字水印提取</title>
     <link rel="stylesheet" href="/code/css/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
     <link rel="stylesheet" href="css/base.css">
 </head>
 <body>
-<form class="pure-form">
-<label for="dText">解码内容：</label><textarea id="dText"  rows="6" class="pure-input-1-2" placeholder="输入需要解码的文字"></textarea><br><br>
-<label for="password">解码密钥：</label><input type="password" id="password" placeholder="默认为空，暂不需输入" class="pure-input-1-2"><br><br>
-<label for="secret">解码结果：</label><input type="text" id="secret" class="pure-input-1-2"><br>
+<form class="pure-form" >
+<label for="dText">解码内容：</label><textarea id="dText"  rows="6" class="pure-input-rounded" placeholder="输入需要解码的文字"></textarea>
+    <br><button type="button" class="btn pure-button" onclick="tryPaste()">粘贴</button><br><br>
+<label for="password">解码密钥：</label><input type="password" id="password" placeholder="默认为空，暂不需输入" class="pure-input-rounded"><br><br>
+<label for="secret">解码结果：</label><input type="text" id="secret" class="pure-input-rounded"><br>
 </form>
-<button onclick="ex()" class="pure-button pure-button-primary">解码</button>
+<p id="message" class="message pure-form-message"></p>
 <br>
-<br>
-<button class="pure-button button-secondary" onclick="javascrtpt:window.location.href='/code/v1'">去加密</button>
-<button class="btn pure-button button-secondary" data-clipboard-target="#secret">
+<button onclick="ex()" class="btn pure-button pure-button-primary">解码</button>
+<button class="btn pure-button pure-button-primary" data-clipboard-target="#secret">
     复制结果
 </button>
+<br><br>
+<a class="pure-button button-secondary" onclick="javascrtpt:window.location.href='/code/v1'">去制作水印文字</a>
+
+
 <script src="js/dc.js"></script>
 <script>
-
+    let message_success = "解码成功！"
+    let message_text_blank = "请输入需要解码的内容"
+    let message_paste_err = "浏览器不支持读取剪切板，请点击输入框手动粘贴"
+    let message_paste_denied = "没有读取系统剪切板的权限，请点击输入框手动粘贴"
     function ex(){
         let result = document.getElementById("dText").value
         if(result == ''){
+            showErr(message_text_blank, 3000)
             return
         }
         document.getElementById("secret").value = extract(result, '')
         document.getElementById("dText").value = ''
+        showSuccess(message_success, 3000)
+    }
+    function paste66(){
+        navigator.permissions.query({ name: 'clipboard-read' }).then((result) => {
+            if (result.state === 'granted' || result.state === 'prompt') {
+                navigator.clipboard.read().then((data) => {
+                    for (let i = 0; i < data.length; i++) {
+                        let contentType = data[i].types[data[i].types.length - 1]
+                        data[i].getType(contentType).then((blob) => {
+                            const reader = new FileReader()
+                            if (contentType == 'text/html' || contentType == 'text/plain') {
+                                // html 和 字符串
+                                reader.readAsText(blob, 'utf-8')
+                                reader.onload = function () {
+                                    document.getElementById("dText").value = reader.result
+                                    // console.log(reader.result);
+                                }
+                            } else {
+                                // 图片
+                                let file = new File([blob], uuid(), { type: contentType, lastModified: Date.now() });
+                            }
+                        })
+
+                    }
+                })
+            }
+        })
+
+    }
+    function readClipboard() {
+        var el = document.createElement('textarea');
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('paste');
+        var clipboardContent = el.value.trim();
+        document.body.removeChild(el);
+        return clipboardContent;
+    }
+
+    // 普通方法
+
+    function tryPaste(){
+        try{
+            paste()
+        }catch (err){
+            showErr(message_paste_err, 3000)
+        }
+    }
+    function paste() {
+        navigator.clipboard // 创建clipboard对象
+            .readText() // 调用readText()方法
+            .then((clipText) => {
+                // 成功回调
+                document.getElementById("dText").value = clipText
+                // console.log(clipText); // clipText是从剪贴板读取到的内容（也就是要粘贴的内容）
+            })
+            .catch((err) => showErr(message_paste_denied, 3000)); // 失败回调
     }
 
 </script>

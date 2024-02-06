@@ -1,4 +1,5 @@
 body{
+    margin: 20px;
     background-color: lemonchiffon;
 }
 input{
@@ -6,4 +7,16 @@ input{
 }
 textarea{
     background-color: burlywood;
+}
+#result{
+    background-color: lightyellow;
+    color: springgreen;
+}
+.message{
+    display: none;
+    color: #ff9a10;
+}
+.btn{
+    text-align: right;
+    margin-left: 60px;
 }

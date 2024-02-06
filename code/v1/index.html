@@ -2,36 +2,74 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta property="og:description" content="在普通文本中添加特殊字符为水印，通过位运算等操作进行加密解密
+快来试试吧"/>
+    <meta property="og:title" content="文本水印加密"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>加密</title>
+    <title>文本水印制作</title>
 <link rel="stylesheet" href="../css/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
     <link rel="stylesheet" href="../css/base.css">
 </head>
 <body>
 <form class="pure-form">
-<label for="word">明文：</label><textarea id="word" rows="6" class="pure-input-1-2" placeholder="输入用于隐藏机密的明文"></textarea><br><br>
-<label for="secret">机密：</label><input type="text" id="secret" class="pure-input-1-2" placeholder="输入需要加密的文字"><br><br>
-<label for="result">结果：</label><textarea id="result" rows="6" class="pure-input-1-2"></textarea>
-<br>
+<label for="word">明文：</label><textarea id="word" rows="6" class="pure-input-rounded" placeholder="此处输入用于隐藏机密的明文,默认使用空格，加密结果需要完整复制后进行解码或消息发送"></textarea><br>
+    <button type="button" class="btn pure-button" onclick="tryPaste('word')">粘贴</button><br>
+<label for="secret">机密：</label><input type="text" id="secret" class="pure-input-rounded" placeholder="此处输入需要隐藏的文字"><br>
+    <button type="button" class="btn pure-button" onclick="tryPaste('secret')">粘贴</button> <br>
+<label for="result">结果：</label><textarea id="result" rows="6" class="pure-input-rounded" placeholder="点击转换按钮后，此处显示处理后的文字信息"></textarea>
+    <br><br>
+    <p id="message" class="message pure-form-message"></p>
+    <div class="left-button">
+        <button onclick="em()" class="btn pure-button pure-button-primary" type="button">转换</button>
+        <button class="btn pure-button pure-button-primary" data-clipboard-target="#result" id="copy" type="button">
+            复制结果
+        </button>
+    </div>
 </form>
-<a onclick="em()" class="pure-button pure-button-primary">转换</a>
-<button class="btn pure-button pure-button-primary" data-clipboard-target="#result">
-    复制结果
-</button>
 <br>
 <br>
-<button class="button-secondary pure-button" onclick="javascrtpt:window.location.href='../'">去解密</button>
+<button class="button-secondary pure-button" onclick="javascrtpt:window.location.href='../'" type="button">去提取文字水印</button>
 </body>
 <script src="../js/dc.js"></script>
 <script>
+    let message_success = "转换成功，结果已存储至剪切板，赶快去发送给你的朋友吧！"
+    let message_secret_blank = "机密内容不能为空！"
+    let message_paste_err = "浏览器不支持读取剪切板，请点击输入框手动粘贴"
+    let message_paste_denied = "没有读取系统剪切板的权限，请点击输入框手动粘贴"
+    let message = document.getElementById("message")
     function em(){
         let text = document.getElementById("word").value
         let secret = document.getElementById("secret").value
-        if(secret.trim() == '') return
+        if(secret.trim() == '') {
+            showErr(message_secret_blank, 3000)
+            return
+        }
         let result = embed(text, secret.trim(), '')
         document.getElementById("result").value = result
         document.getElementById("word").value = ''
+
+        document.getElementById("copy").click()
+        showSuccess(message_success, 3000)
     }
+
+    function tryPaste(target){
+        try{
+            paste(target)
+        }catch (err){
+            showErr(message_paste_err, 3000)
+        }
+    }
+    function paste(target) {
+        navigator.clipboard // 创建clipboard对象
+            .readText() // 调用readText()方法
+            .then((clipText) => {
+                // 成功回调
+                document.getElementById(target).value = clipText
+                // console.log(clipText); // clipText是从剪贴板读取到的内容（也就是要粘贴的内容）
+            })
+            .catch((err) => showErr(message_paste_denied, 3000)); // 失败回调
+    }
+
 </script>
 <script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.11/clipboard.min.js"></script>
 <script>

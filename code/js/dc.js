@@ -13,10 +13,8 @@ function embed(text, secret, password){
     let result = ""
     let bb = writeUTF(secret,true)
     bb.forEach(b=>{
-        // console.log(b & 0xFF)
         let cs = b.toString(2).padStart(8, '0')
         one += cs;
-        // console.log(cs)
     })
     one = one + "1"
     let srcText = text
@@ -36,9 +34,7 @@ function embed(text, secret, password){
 }
 
 function extract(text, password){
-    let secret = ""
     let ext = ""
-    // let charVar = String.fromCharCode(127);
     let ii = 0
     while(ii < text.length){
         if (text[ii] == charVar){
@@ -51,7 +47,7 @@ function extract(text, password){
     }
     let first1 = 0
     let last1 = 0
-// ext = "10010"
+
     for (let i = 0; i < ext.length; i++) {
         if(ext[i] == "1"){
             first1 = i;
@@ -74,12 +70,10 @@ function extract(text, password){
         let ic = parseInt(c,2)
         bt.push(ic)
     }
-    console.log(bt)
     let utfByte = new Uint8Array(bt)
     let decoder = new TextDecoder("utf-8")
-    let utfStr = decoder.decode(utfByte)
-    console.log("utfStr:", utfStr)
-    return utfStr
+    let secret = decoder.decode(utfByte)
+    return secret
 }
 
 function writeUTF(str, isGetBytes=true) {
@@ -121,13 +115,20 @@ function writeUTF(str, isGetBytes=true) {
     }
 }
 
-function copyToClipboard(text) {
-    var textarea = document.createElement('textarea');
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = 0;
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
+function showSuccess(content, timeout){
+    message.innerText = content
+    message.style.color = "#ff9a10"
+    message.style.display='block'
+    setTimeout(clear,timeout)
+}
+function showErr(content, timeout){
+    message.innerText = content
+    message.style.color = "red"
+    message.style.display='block';
+    setTimeout(clear,timeout)
+}
+
+function clear(){
+    message.innerText = ''
+    message.style.display='none';
 }
